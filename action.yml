@@ -141,7 +141,13 @@ runs:
 
     - name: Diff error files
       shell: bash
-      run: diff $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt || true # || true prevents the step from failing if there are differences
+      run: |
+         STRICT_DIFF=$(diff $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt)
+         echo $STRICT_DIFF
+         echo '### DIFF ' >> $GITHUB_STEP_SUMMARY
+         echo '```diff' >> $GITHUB_STEP_SUMMARY
+         echo $STRICT_DIFF >> $GITHUB_STEP_SUMMARY
+         echo '```' >> $GITHUB_STEP_SUMMARY
 
     - name: Compare error counts
       shell: bash
