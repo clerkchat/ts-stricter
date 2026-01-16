@@ -142,9 +142,9 @@ runs:
     - name: Diff error files
       shell: bash
       run: |
-         STRICT_DIFF=$(diff $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt)
+         STRICT_DIFF=$(diff $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt || true )
          echo $STRICT_DIFF
-         echo '### DIFF ' >> $GITHUB_STEP_SUMMARY
+         echo '### Diff ' >> $GITHUB_STEP_SUMMARY
          echo '```diff' >> $GITHUB_STEP_SUMMARY
          echo $STRICT_DIFF >> $GITHUB_STEP_SUMMARY
          echo '```' >> $GITHUB_STEP_SUMMARY
@@ -156,15 +156,16 @@ runs:
         HEAD_ERRORS="${{ steps.head_errors.outputs.head_errors }}"
         BASE_ERRORS="${{ steps.base_errors.outputs.base_errors }}"
 
-        echo "HEAD Errors: $HEAD_ERRORS"
-        echo "Base Errors: $BASE_ERRORS"
+        echo '### Summary ' >> $GITHUB_STEP_SUMMARY
+        echo "HEAD Errors: $HEAD_ERRORS" >> $GITHUB_STEP_SUMMARY
+        echo "Base Errors: $BASE_ERRORS" >> $GITHUB_STEP_SUMMARY
 
         # Fail if HEAD error count is greater than BASE error count
         if [ "$HEAD_ERRORS" -gt "$BASE_ERRORS" ]; then
-          echo "❌ TSC error count ($HEAD_ERRORS) is greater than base branch ($BASE_ERRORS). Failing..."
+          echo "❌ TSC error count ($HEAD_ERRORS) is greater than base branch ($BASE_ERRORS). Failing..." >> $GITHUB_STEP_SUMMARY
           exit 1
         elif [ "$HEAD_ERRORS" -lt "$BASE_ERRORS" ]; then
-          echo "🥳 TSC error count ($HEAD_ERRORS) is less than base branch ($BASE_ERRORS). Passing..."
+          echo "🥳 TSC error count ($HEAD_ERRORS) is less than base branch ($BASE_ERRORS). Passing..." >> $GITHUB_STEP_SUMMARY
         else
-          echo "✅ TSC error count ($HEAD_ERRORS) is equal to than base branch ($BASE_ERRORS). Passing..."
+          echo "✅ TSC error count ($HEAD_ERRORS) is equal to than base branch ($BASE_ERRORS). Passing..." >> $GITHUB_STEP_SUMMARY
         fi
