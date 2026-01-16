@@ -33,7 +33,7 @@ runs:
           local COUNT
 
           # Run TSC and capture output
-          OUTPUT=$(npx tsc --pretty --noEmit --strict 2>&1 || true)
+          OUTPUT=$(npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
 
           # Parse the error count from the lines that match any of these forms:
           # - "Found 1 error in {0}"
@@ -47,7 +47,8 @@ runs:
           if [ -z "$COUNT" ]; then
             COUNT=0
           fi
-
+        
+          echo "$OUTPUT" > head_strict_errors.txt
           echo "$COUNT"
         }
 
@@ -93,7 +94,7 @@ runs:
           local COUNT
 
           # Run TSC and capture output
-          OUTPUT=$(npx tsc --pretty --noEmit --strict 2>&1 || true)
+          OUTPUT=$(npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
 
           # Parse the error count from the lines that match any of these forms:
           # - "Found 1 error in {0}"
@@ -108,6 +109,7 @@ runs:
             COUNT=0
           fi
 
+          echo "$OUTPUT" > base_strict_errors.txt
           echo "$COUNT"
         }
 
@@ -131,6 +133,22 @@ runs:
         echo "Total BASE errors: $TOTAL_BASE_ERRORS"
         echo "base_errors=$TOTAL_BASE_ERRORS" >> $GITHUB_OUTPUT
 
+    - name: 'Upload Artifact'
+      uses: actions/upload-artifact@v4
+      with:
+        name: base_strict_errors.txt
+        path: base_strict_errors.txt
+
+    - name: 'Upload Artifact'
+      uses: actions/upload-artifact@v4
+      with:
+        name: head_strict_errors.txt
+        path: head_strict_errors.txt
+
+    - name: Diff error files
+      shell: bash
+      run: diff base_strict_errors.txt head_strict_errors.txt || true # || true prevents the step from failing if there are differences
+
     - name: Compare error counts
       shell: bash
       run: |
@@ -145,6 +163,8 @@ runs:
         if [ "$HEAD_ERRORS" -gt "$BASE_ERRORS" ]; then
           echo "❌ TSC error count ($HEAD_ERRORS) is greater than base branch ($BASE_ERRORS). Failing..."
           exit 1
+        elif [ "$HEAD_ERRORS" -lt "$BASE_ERRORS" ]; then
+          echo "🥳 TSC error count ($HEAD_ERRORS) is less than base branch ($BASE_ERRORS). Passing..."
         else
-          echo "✅ TSC error count ($HEAD_ERRORS) is not greater than base branch ($BASE_ERRORS). Passing..."
+          echo "✅ TSC error count ($HEAD_ERRORS) is equal to than base branch ($BASE_ERRORS). Passing..."
         fi
