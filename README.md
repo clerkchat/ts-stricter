@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Compare TSC on HEAD vs BASE
-        uses: thinkdx/ts-stricter@v1
+        uses: clerkchat/ts-stricter@v1
 ```
 
 ### Notes
@@ -60,6 +60,9 @@ Contributions and feedback are welcome! If you have new ideas or run into issues
 
 ---
 
-## License
+## Updating the next tag
 
-This project is licensed under the [MIT License](LICENSE). Feel free to modify and reuse in your own projects.
+```bash
+git tag -f -a -m "next" next
+git push -f --tags
+```

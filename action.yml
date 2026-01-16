@@ -141,7 +141,7 @@ runs:
 
     - name: Diff error files
       shell: bash
-      run: diff base_strict_errors.txt head_strict_errors.txt || true # || true prevents the step from failing if there are differences
+      run: diff $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt || true # || true prevents the step from failing if there are differences
 
     - name: Compare error counts
       shell: bash
