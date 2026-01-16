@@ -48,7 +48,7 @@ runs:
             COUNT=0
           fi
         
-          echo "$OUTPUT" > head_strict_errors.txt
+          echo "$OUTPUT" > $RUNNER_TEMP/head_strict_errors.txt
           echo "$COUNT"
         }
 
@@ -109,7 +109,7 @@ runs:
             COUNT=0
           fi
 
-          echo "$OUTPUT" > base_strict_errors.txt
+          echo "$OUTPUT" > $RUNNER_TEMP/base_strict_errors.txt
           echo "$COUNT"
         }
 
@@ -136,14 +136,8 @@ runs:
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
-        name: base_strict_errors.txt
-        path: base_strict_errors.txt
-
-    - name: 'Upload Artifact'
-      uses: actions/upload-artifact@v4
-      with:
-        name: head_strict_errors.txt
-        path: head_strict_errors.txt
+        name: strict_errors.txt
+        path: ${{ runner.temp }}/*_strict_errors.txt
 
     - name: Diff error files
       shell: bash
