@@ -33,7 +33,7 @@ runs:
           local COUNT
 
           # Run TSC and capture output
-          OUTPUT=$(npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
+          OUTPUT=$(NO_COLOR=1 npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
 
           # Parse the error count from the lines that match any of these forms:
           # - "Found 1 error in {0}"
@@ -94,7 +94,7 @@ runs:
           local COUNT
 
           # Run TSC and capture output
-          OUTPUT=$(npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
+          OUTPUT=$(NO_COLOR=1 npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
 
           # Parse the error count from the lines that match any of these forms:
           # - "Found 1 error in {0}"
