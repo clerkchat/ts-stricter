@@ -33,7 +33,7 @@ runs:
           local COUNT
 
           # Run TSC and capture output
-          OUTPUT=$(NO_COLOR=1 npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
+          OUTPUT=$(npx tsc --pretty false --noEmit --strict --skipLibCheck 2>&1 || true)
 
           # Parse the error count from the lines that match any of these forms:
           # - "Found 1 error in {0}"
@@ -94,7 +94,7 @@ runs:
           local COUNT
 
           # Run TSC and capture output
-          OUTPUT=$(NO_COLOR=1 npx tsc --pretty --noEmit --strict --skipLibCheck 2>&1 || true)
+          OUTPUT=$(npx tsc --pretty false --noEmit --strict --skipLibCheck 2>&1 || true)
 
           # Parse the error count from the lines that match any of these forms:
           # - "Found 1 error in {0}"
@@ -142,7 +142,7 @@ runs:
     - name: Diff error files
       shell: bash
       run: |
-         STRICT_DIFF=$(diff $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt || true )
+         STRICT_DIFF=$(diff --color=none $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt || true )
          echo $STRICT_DIFF
          echo '### Diff ' >> $GITHUB_STEP_SUMMARY
          echo '```diff' >> $GITHUB_STEP_SUMMARY
@@ -157,15 +157,15 @@ runs:
         BASE_ERRORS="${{ steps.base_errors.outputs.base_errors }}"
 
         echo '### Summary ' >> $GITHUB_STEP_SUMMARY
-        echo "HEAD Errors: $HEAD_ERRORS" >> $GITHUB_STEP_SUMMARY
-        echo "Base Errors: $BASE_ERRORS" >> $GITHUB_STEP_SUMMARY
+        echo "HEAD Errors: $HEAD_ERRORS" | tee -a $GITHUB_STEP_SUMMARY
+        echo "Base Errors: $BASE_ERRORS" | tee -a $GITHUB_STEP_SUMMARY
 
         # Fail if HEAD error count is greater than BASE error count
         if [ "$HEAD_ERRORS" -gt "$BASE_ERRORS" ]; then
-          echo "❌ TSC error count ($HEAD_ERRORS) is greater than base branch ($BASE_ERRORS). Failing..." >> $GITHUB_STEP_SUMMARY
+          echo "❌ TSC error count ($HEAD_ERRORS) is greater than base branch ($BASE_ERRORS). Failing..." | tee -a $GITHUB_STEP_SUMMARY
           exit 1
         elif [ "$HEAD_ERRORS" -lt "$BASE_ERRORS" ]; then
-          echo "🥳 TSC error count ($HEAD_ERRORS) is less than base branch ($BASE_ERRORS). Passing..." >> $GITHUB_STEP_SUMMARY
+          echo "🥳 TSC error count ($HEAD_ERRORS) is less than base branch ($BASE_ERRORS). Passing..." | tee -a $GITHUB_STEP_SUMMARY
         else
-          echo "✅ TSC error count ($HEAD_ERRORS) is equal to than base branch ($BASE_ERRORS). Passing..." >> $GITHUB_STEP_SUMMARY
+          echo "✅ TSC error count ($HEAD_ERRORS) is equal to than base branch ($BASE_ERRORS). Passing..." | tee -a $GITHUB_STEP_SUMMARY
         fi
