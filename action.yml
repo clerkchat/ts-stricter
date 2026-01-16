@@ -143,10 +143,10 @@ runs:
       shell: bash
       run: |
          STRICT_DIFF=$(diff --color=never $RUNNER_TEMP/base_strict_errors.txt $RUNNER_TEMP/head_strict_errors.txt || true )
-         echo $STRICT_DIFF
+         echo "$STRICT_DIFF"
          echo '### Diff ' >> $GITHUB_STEP_SUMMARY
          echo '```diff' >> $GITHUB_STEP_SUMMARY
-         echo $STRICT_DIFF >> $GITHUB_STEP_SUMMARY
+         echo "$STRICT_DIFF" >> $GITHUB_STEP_SUMMARY
          echo '```' >> $GITHUB_STEP_SUMMARY
 
     - name: Compare error counts
