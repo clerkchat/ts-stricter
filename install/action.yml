@@ -1,0 +1,68 @@
+name: Install Dependencies
+description: Install Node.js dependencies with optional caching
+author: ThinkDX
+
+inputs:
+  package-manager:
+    description: Package manager to use (npm, yarn, or pnpm)
+    required: false
+    default: 'npm'
+  working-directory:
+    description: Directory containing package.json
+    required: false
+    default: '.'
+  cache-dependencies:
+    description: Whether to cache package dependencies
+    required: false
+    default: 'true'
+  install-command:
+    description: Custom install command (overrides default package manager command)
+    required: false
+  node-version:
+    description: Node.js version to use
+    required: false
+  node-version-file:
+    description: Path to custom node version file (relative to working-directory)
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        node-version-file: ${{ inputs.node-version-file }}
+        cache: ${{ (inputs.cache-dependencies == 'true' && inputs.package-manager) || '' }}
+        
+    - name: Get package manager data
+      id: package-manager
+      shell: bash
+      run: |
+        case "${{ inputs.package-manager }}" in
+          "npm")
+            echo "install_cmd=npm ci --no-audit --no-fund" >> $GITHUB_OUTPUT
+            ;;
+          "yarn")
+            echo "install_cmd=yarn install --frozen-lockfile" >> $GITHUB_OUTPUT
+            ;;
+          "pnpm")
+            echo "install_cmd=pnpm install --frozen-lockfile" >> $GITHUB_OUTPUT
+            ;;
+        esac
+
+    - name: Install pnpm
+      if: ${{ inputs.package-manager == 'pnpm' }}
+      uses: pnpm/action-setup@v4
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if [ -n "${{ inputs.install-command }}" ]; then
+          echo "Running custom install command"
+          ${{ inputs.install-command }}
+        else
+          echo "Running default package manager command"
+          ${{ steps.package-manager.outputs.install_cmd }}
+        fi
